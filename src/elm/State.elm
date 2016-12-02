@@ -10,11 +10,13 @@ import Random
 initialModel : Model
 initialModel =
     { doors =
-        [ (Door "#1" False Banana)
-        , (Door "#2" False Goat)
-        , (Door "#3" False Goat)
+        [ (Door "#1" Banana)
+        , (Door "#2" Goat)
+        , (Door "#3" Goat)
         ]
     , selectedDoor = Nothing
+    , revealedDoor = Nothing
+    , finalDoor = Nothing
     }
 
 
@@ -26,30 +28,8 @@ initialModel =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SelectDoor clickedDoor ->
-            let
-                openDoors =
-                    (List.filter (.isOpened) model.doors)
-            in
-                case List.length openDoors of
-                    -- first selection
-                    0 ->
-                        ( { model | selectedDoor = Just clickedDoor }, Cmd.none )
-
-                    -- stay or confirm
-                    1 ->
-                        let
-                            newDoors =
-                                openThisDoor clickedDoor model.doors
-
-                            newModel =
-                                { model | doors = newDoors, selectedDoor = Just clickedDoor }
-                        in
-                            ( newModel, Cmd.none )
-
-                    -- otherwise, don't do anything
-                    _ ->
-                        ( model, Cmd.none )
+        SelectFirstDoor clickedDoor ->
+            ( { model | selectedDoor = Just clickedDoor }, Cmd.none )
 
         ConfirmDoor ->
             let
@@ -71,35 +51,22 @@ update msg model =
                     (randomDoorGenerator unSelectedGoatDoors)
                 )
 
-        RandomlyOpenDoor maybeDoor ->
-            case maybeDoor of
+        RandomlyOpenDoor openedDoor ->
+            case openedDoor of
                 Nothing ->
-                    ( model, Cmd.none )
+                    Debug.crash "There should be a goat to reveal! But I couldn't find one..."
 
                 Just door ->
-                    let
-                        newDoors =
-                            openThisDoor door model.doors
-                    in
-                        ( { model | doors = newDoors }, Cmd.none )
+                    ( { model | revealedDoor = openedDoor }, Cmd.none )
+
+        SelectFinalDoor clickedDoor ->
+            ( { model | finalDoor = Just clickedDoor }, Cmd.none )
 
         Reset ->
             ( initialModel, Cmd.none )
 
-
-{-| mini update just for the doors
--}
-openThisDoor : Door -> Doors -> Doors
-openThisDoor doorToOpen doors =
-    (List.map
-        (\door ->
-            if door == doorToOpen then
-                { door | isOpened = True }
-            else
-                door
-        )
-        doors
-    )
+        NoOp ->
+            ( model, Cmd.none )
 
 
 randomDoorGenerator : List Door -> Random.Generator (Maybe Door)

@@ -4,10 +4,12 @@ module Types exposing (..)
 
 
 type Msg
-    = SelectDoor Door
+    = SelectFirstDoor Door
     | ConfirmDoor
     | RandomlyOpenDoor (Maybe Door)
+    | SelectFinalDoor Door
     | Reset
+    | NoOp
 
 
 
@@ -16,7 +18,9 @@ type Msg
 
 type alias Model =
     { doors : Doors
-    , selectedDoor : Maybe Door
+    , selectedDoor : Maybe Door {- the door that the user first chose -}
+    , revealedDoor : Maybe Door {- the goat door randomly revealed to the user -}
+    , finalDoor : Maybe Door {- the final choice of the user, if they stay, it's the same as the selectedDoor -}
     }
 
 
@@ -26,7 +30,6 @@ type alias Doors =
 
 type alias Door =
     { name : String
-    , isOpened : Bool
     , prize : Prize
     }
 
@@ -43,45 +46,25 @@ type Prize
 type Progress
     = Start
     | FirstDoorSelected Door
-    | FirstDoorConfirmed Door
+    | RandomDoorRevealed Door
     | SwitchedOrStayed Door
 
 
 getProgress : Model -> Progress
 getProgress model =
-    let
-        openDoors =
-            (List.filter (.isOpened) model.doors)
-    in
-        case (List.length openDoors) of
-            0 ->
-                case model.selectedDoor of
-                    Nothing ->
-                        Start
+    case model.selectedDoor of
+        Nothing ->
+            Start
 
-                    Just selectedDoor ->
-                        FirstDoorSelected selectedDoor
+        Just selectedDoor ->
+            case model.revealedDoor of
+                Nothing ->
+                    FirstDoorSelected selectedDoor
 
-            1 ->
-                case model.selectedDoor of
-                    Nothing ->
-                        Debug.crash "can't happen"
+                Just revealedDoor ->
+                    case model.finalDoor of
+                        Nothing ->
+                            RandomDoorRevealed revealedDoor
 
-                    Just selectedDoor ->
-                        case List.head openDoors of
-                            Nothing ->
-                                Debug.crash "head?"
-
-                            Just openDoor ->
-                                FirstDoorConfirmed openDoor
-
-            2 ->
-                case model.selectedDoor of
-                    Nothing ->
-                        Debug.crash "should't happen"
-
-                    Just selectedDoor ->
-                        SwitchedOrStayed selectedDoor
-
-            _ ->
-                Debug.crash "How did you open all those doors??"
+                        Just finalDoor ->
+                            SwitchedOrStayed finalDoor

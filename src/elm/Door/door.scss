@@ -30,12 +30,24 @@ $door-jam-width: 6px;
 
 }
 
+.door__sign {
+    display: inline-block;
+    padding: 10px 20px;
+    background: white;
+    border: 3px solid #333;
+}
+
 .door {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 20%;
 
     background-color: $door-brown;
     border: 6px solid #333;
@@ -57,7 +69,9 @@ $door-jam-width: 6px;
     }
 
     &.is-selected {
-        background-color: red;
+        .door__sign {
+            background-color: #ffe661;
+        }
     }
 }
 

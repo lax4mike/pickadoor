@@ -6,17 +6,26 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
 
-render : Bool -> Door -> Html Msg
-render isSelected door =
-    div [ (class "door__frame "), (onClick <| SelectDoor door) ]
+type alias DoorParams =
+    { isSelected : Bool
+    , isOpen : Bool
+    , onClick : Door -> Msg
+    , door : Door
+    }
+
+
+render : DoorParams -> Html Msg
+render { isSelected, isOpen, onClick, door } =
+    div [ (class "door__frame "), (Html.Events.onClick <| onClick door) ]
         [ div
             [ classList
                 [ ( "door", True )
-                , ( "is-open", door.isOpened )
+                , ( "is-open", isOpen )
                 , ( "is-selected", isSelected )
                 ]
             ]
             [ div [ class "door__knob" ] []
+            , div [ class "door__sign" ] [ text door.name ]
             ]
         , div [ class "door__prize" ] [ renderPrize door ]
         ]

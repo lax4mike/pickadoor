@@ -7,21 +7,56 @@ import Door.View as Door
 
 
 render : Model -> Html Msg
-render { doors, selectedDoor } =
-    div [ class "doors" ]
-        (List.map
-            (\d ->
-                (Door.render (isSelected selectedDoor d) d)
+render model =
+    let
+        clickMsg =
+            case getProgress model of
+                Start ->
+                    SelectFirstDoor
+
+                -- change selection
+                FirstDoorSelected door ->
+                    SelectFirstDoor
+
+                RandomDoorRevealed door ->
+                    SelectFinalDoor
+
+                _ ->
+                    (\d -> NoOp)
+    in
+        div [ class "doors" ]
+            (List.map
+                (\door ->
+                    Door.render
+                        { isSelected = (isSelected model.selectedDoor door)
+                        , isOpen = (isOpen model door)
+                        , onClick = clickMsg
+                        , door = door
+                        }
+                )
+                model.doors
             )
-            doors
-        )
+
+
+isOpen : Model -> Door -> Bool
+isOpen { revealedDoor, finalDoor } door =
+    let
+        isMaybeEqual a maybeB =
+            case maybeB of
+                Nothing ->
+                    False
+
+                Just b ->
+                    a == b
+    in
+        List.any (isMaybeEqual door) [ revealedDoor, finalDoor ]
 
 
 isSelected : Maybe Door -> Door -> Bool
 isSelected selectedDoor door =
     case selectedDoor of
         Just d ->
-            d == door
+            (d == door)
 
         Nothing ->
             False

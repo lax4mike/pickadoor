@@ -31,9 +31,9 @@ renderInstructions model =
             , p [] [ text ("We will now show you another door.") ]
             ]
 
-        FirstDoorConfirmed openedDoor ->
+        RandomDoorRevealed revealedDoor ->
             [ p []
-                [ text ("There is a goat behind door " ++ openedDoor.name ++ ".")
+                [ text ("There is a goat behind door " ++ revealedDoor.name ++ ".")
                 , br [] []
                 , text "Would you like to change your choice?"
                 ]
@@ -73,7 +73,7 @@ renderButton model =
         FirstDoorSelected door ->
             div [] [ button [ type_ "button", (onClick ConfirmDoor) ] [ text "Show me!" ] ]
 
-        FirstDoorConfirmed openedDoor ->
+        RandomDoorRevealed revealedDoor ->
             div [] []
 
         SwitchedOrStayed door ->
