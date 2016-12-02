@@ -37,7 +37,7 @@ update msg model =
                         ( { model | selectedDoor = Just clickedDoor }, Cmd.none )
 
                     -- stay or confirm
-                    _ ->
+                    1 ->
                         let
                             newDoors =
                                 openThisDoor clickedDoor model.doors
@@ -47,28 +47,31 @@ update msg model =
                         in
                             ( newModel, Cmd.none )
 
+                    -- otherwise, don't do anything
+                    _ ->
+                        ( model, Cmd.none )
+
         ConfirmDoor ->
             let
                 -- either the other Goat, or both Goats
+                -- pass this to the random generator to pick one randomly
                 unSelectedGoatDoors =
                     case model.selectedDoor of
                         Nothing ->
-                            model.doors
+                            (Debug.crash "What are you confirming??")
 
                         Just selectedDoor ->
                             List.filter
-                                (\d ->
-                                    (d /= selectedDoor) && (d.prize /= Banana)
-                                )
+                                (\d -> (d /= selectedDoor) && (d.prize /= Banana))
                                 model.doors
             in
                 ( model
                 , Random.generate
-                    OpenDoor
+                    RandomlyOpenDoor
                     (randomDoorGenerator unSelectedGoatDoors)
                 )
 
-        OpenDoor maybeDoor ->
+        RandomlyOpenDoor maybeDoor ->
             case maybeDoor of
                 Nothing ->
                     ( model, Cmd.none )

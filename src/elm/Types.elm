@@ -6,7 +6,7 @@ module Types exposing (..)
 type Msg
     = SelectDoor Door
     | ConfirmDoor
-    | OpenDoor (Maybe Door)
+    | RandomlyOpenDoor (Maybe Door)
     | Reset
 
 
