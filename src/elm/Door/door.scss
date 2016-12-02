@@ -1,0 +1,66 @@
+$door-brown: #986600;
+$door-perspective: perspective(300);
+$door-jam-width: 6px;
+
+
+.door__frame {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 200px;
+    height: 300px;
+    margin: 0 10px;
+
+    border: $door-jam-width solid #333;
+    border-left: $door-jam-width*2 solid #333;
+    border-radius: 4px;
+}
+
+.door__knob {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: #333;
+    border-radius: 50%;
+    transform: translateY(-50%);
+
+}
+
+.door {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    background-color: $door-brown;
+    border: 6px solid #333;
+    border-left: 0;
+
+    cursor: pointer;
+    transform: $door-perspective;
+    transform-origin: 0% 50%;
+    transition:
+        background-image 750ms,
+        border-width 750ms,
+        transform 500ms;
+
+    &.is-open {
+        background-image: linear-gradient(to left, rgba(0,0,0,0.6), $door-brown);
+        border-width: 20px;
+        border-left-width: 0;
+        transform: $door-perspective rotateY(80deg);
+    }
+
+    &.is-selected {
+        background-color: red;
+    }
+}
+
+.door__prize {
+
+}
