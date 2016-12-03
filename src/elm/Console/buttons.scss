@@ -1,0 +1,26 @@
+button {
+
+    padding: 6px 12px;
+
+    font-size: 16px;
+
+    background-color: white;
+    border: 1px solid #333;
+    border-radius: 5px;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+
+    cursor: pointer;
+    transition: box-shadow 250ms;
+
+    &:hover {
+        box-shadow: 1px 1px 8px rgba(0,0,0,0.5);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        box-shadow: 0px 0px 0px rgba(0,0,0,0.5);
+        transform: translateY(1px);
+        outline: none; // the rest of the page isn't 508 complient...
+    }
+
+}

@@ -8,34 +8,41 @@ import Door.View as Door
 
 render : Model -> Html Msg
 render model =
-    let
-        clickMsg =
-            case getProgress model of
-                Start ->
-                    SelectFirstDoor
+    div [ class "doors" ]
+        (List.map
+            (\door ->
+                let
+                    open =
+                        (isOpen model door)
 
-                -- change selection
-                FirstDoorSelected door ->
-                    SelectFirstDoor
+                    clickMsg =
+                        -- don't allow clicking of an open door
+                        if (open) then
+                            (\d -> NoOp)
+                        else
+                            case getProgress model of
+                                Start ->
+                                    SelectFirstDoor
 
-                RandomDoorRevealed door ->
-                    SelectFinalDoor
+                                -- change selection
+                                FirstDoorSelected door ->
+                                    SelectFirstDoor
 
-                _ ->
-                    (\d -> NoOp)
-    in
-        div [ class "doors" ]
-            (List.map
-                (\door ->
+                                RandomDoorRevealed door ->
+                                    SelectFinalDoor
+
+                                _ ->
+                                    (\d -> NoOp)
+                in
                     Door.render
                         { isSelected = (isSelected model.selectedDoor door)
-                        , isOpen = (isOpen model door)
+                        , isOpen = open
                         , onClick = clickMsg
                         , door = door
                         }
-                )
-                model.doors
             )
+            model.doors
+        )
 
 
 isOpen : Model -> Door -> Bool

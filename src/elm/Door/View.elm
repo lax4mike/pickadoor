@@ -16,13 +16,16 @@ type alias DoorParams =
 
 render : DoorParams -> Html Msg
 render { isSelected, isOpen, onClick, door } =
-    div [ (class "door__frame "), (Html.Events.onClick <| onClick door) ]
+    div
+        [ classList
+            [ ( "door__frame", True )
+            , ( "is-open", isOpen )
+            , ( "is-selected", isSelected )
+            ]
+        , (Html.Events.onClick <| onClick door)
+        ]
         [ div
-            [ classList
-                [ ( "door", True )
-                , ( "is-open", isOpen )
-                , ( "is-selected", isSelected )
-                ]
+            [ class "door"
             ]
             [ div [ class "door__knob" ] []
             , div [ class "door__sign" ] [ text door.name ]

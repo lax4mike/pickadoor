@@ -38,7 +38,7 @@ renderInstructions model =
                 , text "Would you like to change your choice?"
                 ]
             , p []
-                [ text "Click the check mark if you wish to stay"
+                [ text "Click the same door if you wish to stay"
                 , br [] []
                 , text "or click the other door to change"
                 ]
@@ -58,8 +58,8 @@ renderInstructions model =
 
                 Goat ->
                     [ div []
-                        [ p [] [ text "You lose" ]
-                        , p [] [ text "You got a stinking goat" ]
+                        [ p [] [ text "You lose." ]
+                        , p [] [ text "You got a stinking goat." ]
                         ]
                     ]
 
@@ -77,4 +77,4 @@ renderButton model =
             div [] []
 
         SwitchedOrStayed door ->
-            div [] [ button [ type_ "button", (onClick Reset) ] [ text "play again?" ] ]
+            div [] [ button [ type_ "button", (onClick Reset) ] [ text "Play again?" ] ]

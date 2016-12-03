@@ -9,15 +9,40 @@ import Random
 
 initialModel : Model
 initialModel =
-    { doors =
-        [ (Door "#1" Banana)
-        , (Door "#2" Goat)
-        , (Door "#3" Goat)
-        ]
+    { doors = []
     , selectedDoor = Nothing
     , revealedDoor = Nothing
     , finalDoor = Nothing
     }
+
+
+scrambleDoorsCmd : Cmd Msg
+scrambleDoorsCmd =
+    Random.generate ScrambleDoors (scrambleDoorsGenerator 3)
+
+
+init =
+    ( initialModel, scrambleDoorsCmd )
+
+
+scrambleDoorsGenerator : Int -> Random.Generator (List Door)
+scrambleDoorsGenerator doorCount =
+    Random.map
+        (\bananaIndex ->
+            (List.range 1 doorCount)
+                |> List.indexedMap
+                    (\index num ->
+                        let
+                            prize =
+                                if (bananaIndex == index) then
+                                    Banana
+                                else
+                                    Goat
+                        in
+                            (Door ("#" ++ (toString num)) prize)
+                    )
+        )
+        (Random.int 0 (doorCount - 1))
 
 
 
@@ -62,8 +87,19 @@ update msg model =
         SelectFinalDoor clickedDoor ->
             ( { model | finalDoor = Just clickedDoor }, Cmd.none )
 
+        ScrambleDoors scrambledDoors ->
+            ( { model | doors = scrambledDoors }, Cmd.none )
+
         Reset ->
-            ( initialModel, Cmd.none )
+            let
+                newModel =
+                    { model
+                        | selectedDoor = Nothing
+                        , revealedDoor = Nothing
+                        , finalDoor = Nothing
+                    }
+            in
+                ( newModel, scrambleDoorsCmd )
 
         NoOp ->
             ( model, Cmd.none )

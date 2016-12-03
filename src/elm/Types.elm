@@ -9,6 +9,7 @@ type Msg
     | RandomlyOpenDoor (Maybe Door)
     | SelectFinalDoor Door
     | Reset
+    | ScrambleDoors (List Door)
     | NoOp
 
 
@@ -17,15 +18,11 @@ type Msg
 
 
 type alias Model =
-    { doors : Doors
+    { doors : List Door
     , selectedDoor : Maybe Door {- the door that the user first chose -}
     , revealedDoor : Maybe Door {- the goat door randomly revealed to the user -}
     , finalDoor : Maybe Door {- the final choice of the user, if they stay, it's the same as the selectedDoor -}
     }
-
-
-type alias Doors =
-    List Door
 
 
 type alias Door =

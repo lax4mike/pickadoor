@@ -61,20 +61,30 @@ $door-jam-width: 6px;
         border-width 750ms,
         transform 500ms;
 
-    &.is-open {
+    .is-open & {
         background-image: linear-gradient(to left, rgba(0,0,0,0.6), $door-brown);
         border-width: 20px;
         border-left-width: 0;
         transform: $door-perspective rotateY(80deg);
     }
 
-    &.is-selected {
+    .is-selected & {
         .door__sign {
             background-color: #ffe661;
         }
     }
 }
 
-.door__prize {
 
+/**
+ * make the prize hidden if the door isn't open.
+ * this prevents the user from seeing the prize after it's been
+ * scrambled as the door is animating closed
+ */
+.door__prize {
+    display: none;
+
+    .is-open & {
+        display: block;
+    }
 }

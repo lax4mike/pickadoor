@@ -10,7 +10,12 @@ import Console.View as Console
 
 rootView : Model -> Html Msg
 rootView model =
-    div [ class "container" ]
-        [ Doors.render model
-        , Console.render model
-        ]
+    case List.length model.doors of
+        0 ->
+            div [ class "container" ] [ text "Randomizing..." ]
+
+        _ ->
+            div [ class "container" ]
+                [ Doors.render model
+                , Console.render model
+                ]
