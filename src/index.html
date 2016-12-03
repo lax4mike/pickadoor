@@ -13,11 +13,31 @@
 
     <div class="js-mount"></div>
 
+
     <script src="js/main-generated.js"></script>
     <script>
         var mount = document.querySelector(".js-mount");
         var app = Elm.Main.embed(mount);
+
+        // when elm tells us, play the audio file
+        app.ports.playSound.subscribe(function(src) {
+            // make an audio element and add it to the page
+            var body = document.querySelector("body");
+            var audio = document.createElement("audio");
+            audio.src = src;
+            audio.volume = 0.25;
+
+            // remove the element when it's done playing
+            audio.addEventListener("ended", function(){
+                audio.remove();
+            });
+
+            body.appendChild(audio);
+            audio.play();
+        });
+
     </script>
+
 
 </body>
 </html>

@@ -2,9 +2,18 @@ module State exposing (..)
 
 import Types exposing (..)
 import Random
+import Ports exposing (..)
 
 
 -- INIT
+
+
+bananaSound =
+    "img/banana.wav"
+
+
+goatSound =
+    "img/bleeeat.wav"
 
 
 initialModel : Model
@@ -82,10 +91,19 @@ update msg model =
                     Debug.crash "There should be a goat to reveal! But I couldn't find one..."
 
                 Just door ->
-                    ( { model | revealedDoor = openedDoor }, Cmd.none )
+                    ( { model | revealedDoor = openedDoor }, playSound goatSound )
 
         SelectFinalDoor clickedDoor ->
-            ( { model | finalDoor = Just clickedDoor }, Cmd.none )
+            let
+                doorSound =
+                    case clickedDoor.prize of
+                        Banana ->
+                            bananaSound
+
+                        Goat ->
+                            goatSound
+            in
+                ( { model | finalDoor = Just clickedDoor }, playSound doorSound )
 
         ScrambleDoors scrambledDoors ->
             ( { model | doors = scrambledDoors }, Cmd.none )
