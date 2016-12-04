@@ -16,7 +16,12 @@ module.exports = function elmTask(config, env){
 
         watch: config.root + "/**/*.elm",
 
-        filename: "main.js"
+        filename: "main.js",
+
+        elm: {
+            debug: !env.production() ? true : false,
+            warn: false // notify will do this
+        }
     };
 
     quench.registerWatcher("elm", elmConfig.watch);
@@ -27,10 +32,7 @@ module.exports = function elmTask(config, env){
 
         // don't use drano for elm, because it already prints the error
         // but we still want the notification
-        var elmStream = elm.make({
-            debug: true,
-            warn: false // notify will do this
-        })
+        var elmStream = elm.make(elmConfig.elm)
         .on("error", function(error){
             notify.onError({
                 title: "<%= error.plugin %>",
