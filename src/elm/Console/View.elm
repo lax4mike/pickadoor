@@ -40,7 +40,7 @@ renderInstructions model =
             , p []
                 [ text "Click the same door if you wish to stay"
                 , br [] []
-                , text "or click the other door to change"
+                , text "or click the other door to change."
                 ]
             ]
 

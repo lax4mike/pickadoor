@@ -1,4 +1,4 @@
-module Door.View exposing (..)
+module Doors.Door.View exposing (..)
 
 import Types exposing (..)
 import Html exposing (..)
@@ -18,19 +18,21 @@ render : DoorParams -> Html Msg
 render { isSelected, isOpen, onClick, door } =
     div
         [ classList
-            [ ( "door__frame", True )
+            [ ( "door", True )
             , ( "is-open", isOpen )
             , ( "is-selected", isSelected )
             ]
         , (Html.Events.onClick <| onClick door)
         ]
-        [ div
-            [ class "door"
+        [ div [ class "door__prize" ] [ renderPrize door ]
+        , div [ class "door__frame" ]
+            [ div
+                [ class "door__door"
+                ]
+                [ div [ class "door__knob" ] []
+                , div [ class "door__sign" ] [ text door.name ]
+                ]
             ]
-            [ div [ class "door__knob" ] []
-            , div [ class "door__sign" ] [ text door.name ]
-            ]
-        , div [ class "door__prize" ] [ renderPrize door ]
         ]
 
 

@@ -1,0 +1,156 @@
+$door-brown: #986600;
+$door-perspective: perspective(300);
+
+$border-small: 3px;
+$border-large: 6px;
+$breakpoint: 600px;
+
+
+.door {
+    position: relative;
+    min-width: 100px;
+    margin: 0 10px;
+
+    flex-shrink: 0;
+    flex-grow: 1;
+    flex-basis: auto;
+
+    // we don't want the doors too huge on big screens
+    max-width: 200px;
+
+    // always keep the same ratio, when squeezed down
+    // on smaller screens
+    &:before {
+        display: block;
+        content: "";
+        width: 100%;
+        padding-top: 150%;
+    }
+}
+
+.door__frame {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    @mixin borders($width){
+        border: $width solid #333;
+        border-left: $width*2 solid #333;
+        border-radius: 4px;
+    }
+
+    @include borders($border-small);
+
+    @media (min-width: $breakpoint){
+        @include borders($border-large);
+    }
+}
+
+
+
+// is inside the .door__frame
+.door__door {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 20%;
+
+    background-color: $door-brown;
+    border: $border-small solid #333;
+    border-left: 0;
+
+    cursor: pointer;
+    transform: $door-perspective;
+    transform-origin: 0% 50%;
+    transition:
+        background-image 750ms,
+        border-width 750ms,
+        transform 500ms;
+
+    .is-open & {
+        background-image: linear-gradient(to left, rgba(0,0,0,0.6), $door-brown);
+        border-width: $border-small * 3;
+        border-left-width: 0;
+        transform: $door-perspective rotateY(80deg);
+    }
+
+    .is-selected & {
+        .door__sign {
+            background-color: #ffe661;
+        }
+    }
+
+    // for larger screens
+    @media (min-width: $breakpoint){
+        border: $border-large solid #333;
+        border-left: 0;
+
+        .is-open & {
+            border-width: $border-large * 3;
+            border-left-width: 0;
+        }
+    }
+}
+
+.door__knob {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: #333;
+    border-radius: 50%;
+    transform: translateY(-50%);
+
+    display: none;
+
+    @media (min-width: $breakpoint){
+        display: block;
+    }
+
+}
+
+.door__sign {
+    display: inline-block;
+    padding: 10px 20px;
+    background: white;
+    border: 3px solid #333;
+}
+
+
+/**
+ * make the prize hidden if the door isn't open.
+ * this prevents the user from seeing the prize after it's been
+ * scrambled as the door is animating closed
+ */
+.door__prize {
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        max-width: 70%;
+        max-height: 70%;
+    }
+
+    visibility: hidden;
+
+    .is-open & {
+        visibility: visible;
+    }
+}

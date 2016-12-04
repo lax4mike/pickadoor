@@ -3,7 +3,7 @@ module Doors.View exposing (..)
 import Types exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Door.View as Door
+import Doors.Door.View as Door
 
 
 render : Model -> Html Msg

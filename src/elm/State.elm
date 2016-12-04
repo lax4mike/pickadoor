@@ -95,6 +95,7 @@ update msg model =
 
         SelectFinalDoor clickedDoor ->
             let
+                doorSound : String
                 doorSound =
                     case clickedDoor.prize of
                         Banana ->
