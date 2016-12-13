@@ -15,24 +15,35 @@ render model =
                     open =
                         (isOpen model door)
 
+                    clickMsg : Door -> Msg
                     clickMsg =
-                        -- don't allow clicking of an open door
-                        if (open) then
-                            (\d -> NoOp)
-                        else
-                            case getProgress model of
-                                Start ->
-                                    SelectFirstDoor
+                        case getProgress model of
+                            Start ->
+                                SelectFirstDoor
 
-                                -- change selection
-                                FirstDoorSelected door ->
-                                    SelectFirstDoor
+                            -- change selection, or confirm
+                            FirstDoorSelected door ->
+                                case model.selectedDoor of
+                                    Nothing ->
+                                        SelectFirstDoor
 
-                                RandomDoorRevealed door ->
+                                    Just selected ->
+                                        (\clickedDoor ->
+                                            if clickedDoor == selected then
+                                                ConfirmDoor
+                                            else
+                                                SelectFirstDoor clickedDoor
+                                        )
+
+                            RandomDoorRevealed door ->
+                                -- don't allow clicking of an open door
+                                if (open) then
+                                    (\clickedDoor -> NoOp)
+                                else
                                     SelectFinalDoor
 
-                                _ ->
-                                    (\d -> NoOp)
+                            SwitchedOrStayed door ->
+                                (\clickedDoor -> Reset)
                 in
                     Door.render
                         { isSelected = (isSelected model.selectedDoor door)
