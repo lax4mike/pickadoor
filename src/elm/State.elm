@@ -4,6 +4,8 @@ import Types exposing (..)
 import Random
 import RandomGenerators exposing (..)
 import Ports exposing (..)
+import Keyboard exposing (KeyCode)
+import Char
 
 
 -- INIT
@@ -27,7 +29,6 @@ initialModel =
         , revealedDoor = Nothing
         , finalDoor = Nothing
         }
-    , history = []
     , results =
         { stayed =
             { win = 0, lose = 0 }
@@ -51,15 +52,6 @@ update msg model =
     let
         ( newCurrentGame, gameCmd ) =
             updateCurrentGame msg model.currentGame
-
-        newHistory =
-            case msg of
-                -- if the game is done, add it to the history
-                SelectFinalDoor door ->
-                    newCurrentGame :: model.history
-
-                _ ->
-                    model.history
 
         oldResults =
             model.results
@@ -102,8 +94,7 @@ update msg model =
                     model.results
     in
         ( { model
-            | history = newHistory
-            , currentGame = newCurrentGame
+            | currentGame = newCurrentGame
             , results = newResults
           }
         , gameCmd
@@ -169,17 +160,21 @@ updateCurrentGame msg model =
                     ( { model | revealedDoor = openedDoor }, playSound goatSound )
 
         SelectFinalDoor clickedDoor ->
-            let
-                doorSound : String
-                doorSound =
-                    case clickedDoor.prize of
-                        Banana ->
-                            bananaSound
+            -- don't allow clicking of an open door
+            if (isDoorOpen model clickedDoor) then
+                ( model, Cmd.none )
+            else
+                let
+                    doorSound : String
+                    doorSound =
+                        case clickedDoor.prize of
+                            Banana ->
+                                bananaSound
 
-                        Goat ->
-                            goatSound
-            in
-                ( { model | finalDoor = Just clickedDoor }, playSound doorSound )
+                            Goat ->
+                                goatSound
+                in
+                    ( { model | finalDoor = Just clickedDoor }, playSound doorSound )
 
         ScrambleDoors scrambledDoors ->
             ( { model | doors = scrambledDoors }, Cmd.none )
@@ -203,6 +198,58 @@ updateCurrentGame msg model =
 -- SUBSCRIPTIONS
 
 
+keycodeToMaybeDoor : List Door -> KeyCode -> Maybe Door
+keycodeToMaybeDoor doors keyCode =
+    keyCode
+        |> Char.fromCode
+        |> String.fromChar
+        |> String.toInt
+        |> Result.toMaybe
+        |> Maybe.map (flip (-) 1)
+        |> Maybe.map (flip List.drop doors)
+        |> Maybe.andThen List.head
+
+
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
+subscriptions { currentGame } =
+    case getProgress currentGame of
+        Start ->
+            Keyboard.downs
+                (\keyCode ->
+                    case (keycodeToMaybeDoor currentGame.doors keyCode) of
+                        Just pressedDoor ->
+                            (SelectFirstDoor pressedDoor)
+
+                        Nothing ->
+                            NoOp
+                )
+
+        FirstDoorSelected selectedDoor ->
+            Keyboard.downs
+                (\keyCode ->
+                    case (keycodeToMaybeDoor currentGame.doors keyCode) of
+                        Just pressedDoor ->
+                            if (pressedDoor == selectedDoor) then
+                                ConfirmDoor
+                            else
+                                SelectFirstDoor pressedDoor
+
+                        Nothing ->
+                            NoOp
+                )
+
+        RandomDoorRevealed revealedDoor ->
+            Keyboard.downs
+                (\keyCode ->
+                    case (keycodeToMaybeDoor currentGame.doors keyCode) of
+                        Just door ->
+                            (SelectFinalDoor door)
+
+                        Nothing ->
+                            NoOp
+                )
+
+        SwitchedOrStayed finalDoor ->
+            -- reset on any keypress
+            Keyboard.downs
+                (\keyCode -> Reset)

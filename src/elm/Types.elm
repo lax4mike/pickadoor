@@ -18,8 +18,7 @@ type Msg
 
 
 type alias Model =
-    { history : List GameModel
-    , results : GameResults
+    { results : GameResults
     , currentGame : GameModel
     }
 
@@ -52,6 +51,20 @@ type alias Door =
     { name : String
     , prize : Prize
     }
+
+
+isDoorOpen : GameModel -> Door -> Bool
+isDoorOpen { revealedDoor, finalDoor } door =
+    let
+        isMaybeEqual a maybeB =
+            case maybeB of
+                Nothing ->
+                    False
+
+                Just b ->
+                    a == b
+    in
+        List.any (isMaybeEqual door) [ revealedDoor, finalDoor ]
 
 
 type Prize

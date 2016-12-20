@@ -13,7 +13,7 @@ render model =
             (\door ->
                 let
                     open =
-                        (isOpen model door)
+                        (isDoorOpen model door)
 
                     clickMsg : Door -> Msg
                     clickMsg =
@@ -36,11 +36,7 @@ render model =
                                         )
 
                             RandomDoorRevealed door ->
-                                -- don't allow clicking of an open door
-                                if (open) then
-                                    (\clickedDoor -> NoOp)
-                                else
-                                    SelectFinalDoor
+                                SelectFinalDoor
 
                             SwitchedOrStayed door ->
                                 (\clickedDoor -> Reset)
@@ -54,20 +50,6 @@ render model =
             )
             model.doors
         )
-
-
-isOpen : GameModel -> Door -> Bool
-isOpen { revealedDoor, finalDoor } door =
-    let
-        isMaybeEqual a maybeB =
-            case maybeB of
-                Nothing ->
-                    False
-
-                Just b ->
-                    a == b
-    in
-        List.any (isMaybeEqual door) [ revealedDoor, finalDoor ]
 
 
 isSelected : Maybe Door -> Door -> Bool

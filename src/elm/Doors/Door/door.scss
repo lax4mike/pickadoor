@@ -148,6 +148,7 @@ $breakpoint: 600px;
         max-height: 70%;
     }
 
+    user-select: none; // prevent double click select of prize img
     visibility: hidden;
 
     .is-open & {
