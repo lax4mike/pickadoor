@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Doors.Door.View as Door
 
 
-render : Model -> Html Msg
+render : GameModel -> Html Msg
 render model =
     div [ class "doors" ]
         (List.map
@@ -56,7 +56,7 @@ render model =
         )
 
 
-isOpen : Model -> Door -> Bool
+isOpen : GameModel -> Door -> Bool
 isOpen { revealedDoor, finalDoor } door =
     let
         isMaybeEqual a maybeB =

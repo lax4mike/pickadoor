@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
 
-render : Model -> Html Msg
+render : GameModel -> Html Msg
 render model =
     div [ class "console" ]
         [ div [ class "console__instructions" ] (renderInstructions model)
@@ -14,7 +14,7 @@ render model =
         ]
 
 
-renderInstructions : Model -> List (Html Msg)
+renderInstructions : GameModel -> List (Html Msg)
 renderInstructions model =
     case getProgress model of
         Start ->
@@ -64,7 +64,7 @@ renderInstructions model =
                     ]
 
 
-renderButton : Model -> Html Msg
+renderButton : GameModel -> Html Msg
 renderButton model =
     case getProgress model of
         Start ->

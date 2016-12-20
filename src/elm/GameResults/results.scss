@@ -1,0 +1,29 @@
+.results {
+    margin: 10px auto;
+}
+
+table {
+    margin: auto;
+    border-collapse: collapse;
+
+    tr:first-child {
+
+        // colum headers
+        th:not(:first-child) {
+            padding: 7px 10px;
+        }
+    }
+
+    tr {
+        // row headers
+        > th:first-child {
+            padding: 10px;
+        }
+
+        td, th {
+            text-align: center;
+            border-bottom: 1px solid #999;
+            border-right: 1px solid #999;
+        }
+    }
+}

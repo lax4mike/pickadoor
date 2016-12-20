@@ -1,0 +1,14 @@
+.bottom {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap-reverse;
+    min-height: 10em;
+
+    margin: 20px 0;
+
+    > * {
+        flex-grow: 1;
+        flex-shrink: 0;
+        flex-basis: 50%;
+    }
+}

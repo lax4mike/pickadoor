@@ -1,9 +1,12 @@
 .console {
     max-width: 800px;
+    min-width: 300px;
+    min-height: 10em;
     margin: 0 auto;
 }
 
 .console__instructions {
+    padding: 10px;
     text-align: center;
 }
 

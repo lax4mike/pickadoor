@@ -18,6 +18,29 @@ type Msg
 
 
 type alias Model =
+    { history : List GameModel
+    , results : GameResults
+    , currentGame : GameModel
+    }
+
+
+type alias GameResults =
+    { stayed :
+        { win : Int, lose : Int }
+    , switched :
+        { win : Int, lose : Int }
+    }
+
+
+type GameResult
+    = StayedWon
+    | StayedLost
+    | SwitchedWon
+    | SwitchedLost
+    | NotDone
+
+
+type alias GameModel =
     { doors : List Door
     , selectedDoor : Maybe Door {- the door that the user first chose -}
     , revealedDoor : Maybe Door {- the goat door randomly revealed to the user -}
@@ -47,7 +70,7 @@ type Progress
     | SwitchedOrStayed Door
 
 
-getProgress : Model -> Progress
+getProgress : GameModel -> Progress
 getProgress model =
     case model.selectedDoor of
         Nothing ->

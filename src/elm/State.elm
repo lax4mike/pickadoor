@@ -2,65 +2,140 @@ module State exposing (..)
 
 import Types exposing (..)
 import Random
+import RandomGenerators exposing (..)
 import Ports exposing (..)
 
 
 -- INIT
 
 
+bananaSound : String
 bananaSound =
     "img/banana.wav"
 
 
+goatSound : String
 goatSound =
     "img/bleeeat.wav"
 
 
 initialModel : Model
 initialModel =
-    { doors = []
-    , selectedDoor = Nothing
-    , revealedDoor = Nothing
-    , finalDoor = Nothing
+    { currentGame =
+        { doors = []
+        , selectedDoor = Nothing
+        , revealedDoor = Nothing
+        , finalDoor = Nothing
+        }
+    , history = []
+    , results =
+        { stayed =
+            { win = 0, lose = 0 }
+        , switched =
+            { win = 0, lose = 0 }
+        }
     }
 
 
-scrambleDoorsCmd : Cmd Msg
-scrambleDoorsCmd =
-    Random.generate ScrambleDoors (scrambleDoorsGenerator 3)
-
-
+init : ( Model, Cmd Msg )
 init =
     ( initialModel, scrambleDoorsCmd )
 
 
-scrambleDoorsGenerator : Int -> Random.Generator (List Door)
-scrambleDoorsGenerator doorCount =
-    Random.map
-        (\bananaIndex ->
-            (List.range 1 doorCount)
-                |> List.indexedMap
-                    (\index num ->
-                        let
-                            prize =
-                                if (bananaIndex == index) then
-                                    Banana
-                                else
-                                    Goat
-                        in
-                            (Door ("#" ++ (toString num)) prize)
-                    )
-        )
-        (Random.int 0 (doorCount - 1))
 
-
-
--- randomizeDoors
 -- UPDATE
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        ( newCurrentGame, gameCmd ) =
+            updateCurrentGame msg model.currentGame
+
+        newHistory =
+            case msg of
+                -- if the game is done, add it to the history
+                SelectFinalDoor door ->
+                    newCurrentGame :: model.history
+
+                _ ->
+                    model.history
+
+        oldResults =
+            model.results
+
+        incrementWin { win, lose } =
+            { win = win + 1, lose = lose }
+
+        incrementLose { win, lose } =
+            { win = win, lose = lose + 1 }
+
+        newResults =
+            case msg of
+                -- if the game is done, add it to the history
+                SelectFinalDoor door ->
+                    case getGameResult newCurrentGame of
+                        StayedWon ->
+                            { oldResults
+                                | stayed = incrementWin oldResults.stayed
+                            }
+
+                        StayedLost ->
+                            { oldResults
+                                | stayed = incrementLose oldResults.stayed
+                            }
+
+                        SwitchedWon ->
+                            { oldResults
+                                | switched = incrementWin oldResults.switched
+                            }
+
+                        SwitchedLost ->
+                            { oldResults
+                                | switched = incrementLose oldResults.switched
+                            }
+
+                        NotDone ->
+                            oldResults
+
+                _ ->
+                    model.results
+    in
+        ( { model
+            | history = newHistory
+            , currentGame = newCurrentGame
+            , results = newResults
+          }
+        , gameCmd
+        )
+
+
+getGameResult : GameModel -> GameResult
+getGameResult game =
+    Maybe.withDefault NotDone
+        (Maybe.map2 (,) game.finalDoor game.selectedDoor
+            |> Maybe.andThen
+                (\( finalDoor, selectedDoor ) ->
+                    if (finalDoor == selectedDoor) then
+                        case finalDoor.prize of
+                            Banana ->
+                                Just StayedWon
+
+                            Goat ->
+                                Just StayedLost
+                    else
+                        case finalDoor.prize of
+                            Banana ->
+                                Just SwitchedWon
+
+                            Goat ->
+                                Just SwitchedLost
+                )
+        )
+
+
+updateCurrentGame : Msg -> GameModel -> ( GameModel, Cmd Msg )
+updateCurrentGame msg model =
     case msg of
         SelectFirstDoor clickedDoor ->
             ( { model | selectedDoor = Just clickedDoor }, Cmd.none )
@@ -88,7 +163,7 @@ update msg model =
         RandomlyOpenDoor openedDoor ->
             case openedDoor of
                 Nothing ->
-                    Debug.crash "There should be a goat to reveal! But I couldn't find one..."
+                    (Debug.crash "There should be a goat to reveal! But I couldn't find one...")
 
                 Just door ->
                     ( { model | revealedDoor = openedDoor }, playSound goatSound )
@@ -122,15 +197,6 @@ update msg model =
 
         NoOp ->
             ( model, Cmd.none )
-
-
-randomDoorGenerator : List Door -> Random.Generator (Maybe Door)
-randomDoorGenerator doors =
-    Random.map
-        (\i ->
-            List.drop i doors |> List.head
-        )
-        (Random.int 0 ((List.length doors) - 1))
 
 
 
