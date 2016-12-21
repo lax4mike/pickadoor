@@ -2,15 +2,39 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Types exposing (..)
-import State
 import View
+import RandomGenerators exposing (scrambleDoorsCmd)
+import Updates.RootUpdate as RootUpdate
+import Subscriptions.KeyboardSubscriptions as KeyboardSubscriptions
+
+
+initialModel : Model
+initialModel =
+    { currentGame =
+        { doors = []
+        , selectedDoor = Nothing
+        , revealedDoor = Nothing
+        , finalDoor = Nothing
+        }
+    , results =
+        { stayed =
+            { win = 0, lose = 0 }
+        , switched =
+            { win = 0, lose = 0 }
+        }
+    }
+
+
+init : ( Model, Cmd Msg )
+init =
+    ( initialModel, scrambleDoorsCmd )
 
 
 main : Program Never Model Msg
 main =
     Html.program
-        { init = State.init
-        , update = State.update
-        , subscriptions = State.subscriptions
+        { init = init
+        , update = RootUpdate.update
+        , subscriptions = KeyboardSubscriptions.subscriptions
         , view = View.rootView
         }
