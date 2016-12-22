@@ -1,9 +1,18 @@
 $door-brown: #986600;
 $door-perspective: perspective(300px);
+$door-duration: 500ms;
 
 $border-small: 3px;
 $border-large: 6px;
 $breakpoint: 600px;
+
+$cheating-opacity: 0.5;
+$cheating-duration: 250ms;
+
+$frame-color: #333;
+// using this instead of opacity because the background of the door
+// shines through the door border
+$dimmed-frame-color: #999;
 
 
 .door {
@@ -35,9 +44,15 @@ $breakpoint: 600px;
     bottom: 0;
     left: 0;
 
+    transition: opacity $cheating-duration;
+
+    .is-cheating & {
+        border-color: $dimmed-frame-color;
+    }
+
     @mixin borders($width){
-        border: $width solid #333;
-        border-left: $width*2 solid #333;
+        border: $width solid $frame-color;
+        border-left: $width*2 solid $frame-color;
         border-radius: 4px;
     }
 
@@ -64,19 +79,19 @@ $breakpoint: 600px;
     padding-top: 20%;
 
     background-color: $door-brown;
-    border: $border-small solid #333;
+    border: $border-small solid $frame-color;
     border-left: 0;
 
     cursor: pointer;
     transform: $door-perspective;
     transform-origin: 0% 50%;
     transition:
-        background-image 750ms,
-        border-width 750ms,
-        transform 500ms;
+        border-width $door-duration,
+        transform $door-duration,
+        background-color $cheating-duration;
 
     .is-open & {
-        background-image: linear-gradient(to left, rgba(0,0,0,0.6), $door-brown);
+        background-image: linear-gradient(to left, rgba(0,0,0,0.4), $door-brown);
         border-width: $border-small * 3;
         border-left-width: 0;
         transform: $door-perspective rotateY(80deg);
@@ -88,9 +103,22 @@ $breakpoint: 600px;
         }
     }
 
+    // dim the door if they're cheating
+    .is-cheating & {
+        background-color: rgba($door-brown, $cheating-opacity);
+        border-color: $dimmed-frame-color;
+    }
+
+    // remove door shading when they're cheating AND the door is open
+    .is-cheating .is-open & {
+        background-image: none;
+    }
+
+
+
     // for larger screens
     @media (min-width: $breakpoint){
-        border: $border-large solid #333;
+        border: $border-large solid $frame-color;
         border-left: 0;
 
         .is-open & {
@@ -106,11 +134,15 @@ $breakpoint: 600px;
     right: 10px;
     width: 20px;
     height: 20px;
-    background-color: #333;
+    background-color: $frame-color;
     border-radius: 50%;
     transform: translateY(-50%);
 
     display: none;
+
+    .is-cheating & {
+        background-color: $dimmed-frame-color;
+    }
 
     @media (min-width: $breakpoint){
         display: block;
@@ -122,12 +154,12 @@ $breakpoint: 600px;
     display: inline-block;
     padding: 10px 20px;
     background: white;
-    border: 3px solid #333;
+    border: 3px solid $frame-color;
 }
 
 
 /**
- * make the prize hidden if the door isn't open.
+ * make the prize hidden while the door is shutting (@keyframes delay-show)
  * this prevents the user from seeing the prize after it's been
  * scrambled as the door is animating closed
  */
@@ -149,9 +181,24 @@ $breakpoint: 600px;
     }
 
     user-select: none; // prevent double click select of prize img
-    visibility: hidden;
+
+    animation: delay-show $door-duration;
 
     .is-open & {
-        visibility: visible;
+        animation: none;
+    }
+}
+
+// when the door is closing, hide the prize,
+// then animate it back in when the door is shut
+@keyframes delay-show {
+    0%{
+        opacity: 0;
+    }
+    70% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }

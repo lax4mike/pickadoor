@@ -15,10 +15,19 @@ update msg model =
         -- soon as the game is finished (before it resets)
         newResults =
             ResultsUpdate.update msg model.results newCurrentGame
+
+        newIsCheating =
+            case msg of
+                ToggleCheat cheat ->
+                    cheat
+
+                _ ->
+                    model.isCheating
     in
         ( { model
             | currentGame = newCurrentGame
             , results = newResults
+            , isCheating = newIsCheating
           }
         , gameCmd
         )

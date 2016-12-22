@@ -11,6 +11,7 @@ type Msg
     | Reset
     | ScrambleDoors (List Door)
     | NoOp
+    | ToggleCheat Bool
 
 
 
@@ -20,6 +21,7 @@ type Msg
 type alias Model =
     { results : GameResults
     , currentGame : GameModel
+    , isCheating : Bool
     }
 
 

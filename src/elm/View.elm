@@ -6,6 +6,7 @@ import Types exposing (..)
 import Doors.View as Doors
 import Console.View as Console
 import GameResults.View as GameResults
+import Cheat.View as Cheat
 
 
 rootView : Model -> Html Msg
@@ -15,10 +16,13 @@ rootView model =
             div [ class "container" ] [ text "Randomizing..." ]
 
         _ ->
-            div [ class "container" ]
+            div [ classList [ ( "container", True ), ( "is-cheating", model.isCheating ) ] ]
                 [ Doors.render model.currentGame
                 , div [ class "bottom" ]
-                    [ GameResults.render model.results
+                    [ div []
+                        [ GameResults.render model.results
+                        , Cheat.render model
+                        ]
                     , Console.render model.currentGame
                     ]
                 ]

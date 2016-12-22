@@ -65,5 +65,5 @@ update msg results currentGame =
                 | switched = incrementLose results.switched
             }
 
-        NotDone ->
+        _ ->
             results

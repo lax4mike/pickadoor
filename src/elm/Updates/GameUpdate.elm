@@ -3,17 +3,7 @@ module Updates.GameUpdate exposing (update)
 import Types exposing (..)
 import Random
 import RandomGenerators exposing (randomDoorGenerator, scrambleDoorsCmd)
-import Ports exposing (playSound)
-
-
-bananaSound : String
-bananaSound =
-    "img/banana.wav"
-
-
-goatSound : String
-goatSound =
-    "img/bleeeat.wav"
+import Ports exposing (playSound, bananaSound, goatSound)
 
 
 update : Msg -> GameModel -> ( GameModel, Cmd Msg )
@@ -81,5 +71,5 @@ update msg model =
             in
                 ( newModel, scrambleDoorsCmd )
 
-        NoOp ->
+        _ ->
             ( model, Cmd.none )

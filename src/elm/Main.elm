@@ -22,6 +22,7 @@ initialModel =
         , switched =
             { win = 0, lose = 0 }
         }
+    , isCheating = False
     }
 
 
