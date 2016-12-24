@@ -12,27 +12,28 @@ import Json.Decode
 render : Model -> Html Msg
 render model =
     let
-        cheat =
+        -- make it hidden instead of display none so the simulate link doesn't jump
+        shouldShowCheat =
             if (model.results.stayed.win > 0 && model.results.switched.win > 0) then
-                div [ class "controls__cheat" ]
-                    [ label []
-                        [ input [ type_ "checkbox", onCheck ToggleCheat ] []
-                        , text " cheat"
-                        ]
-                    ]
+                "visible"
             else
-                text ""
+                "hidden"
 
         onClickPreventDefault : Msg -> Attribute Msg
         onClickPreventDefault msg =
             onWithOptions "click" { stopPropagation = True, preventDefault = True } (Json.Decode.succeed msg)
     in
         div [ class "controls" ]
-            [ a [ href "#", onClickPreventDefault SimulateABunch ]
+            [ a [ href "#", onClickPreventDefault (SimulateABunch 100) ]
                 [ text "simulate 100 times" ]
-            , text " - "
-            , a
-                [ href "#", onClickPreventDefault SimulateOnce ]
-                [ text "simulate once" ]
-            , cheat
+              -- , a
+              --     [ href "#", onClickPreventDefault SimulateOnce ]
+              --     [ text "simulate once" ]
+            , div
+                [ class "controls__cheat", style [ ( "visibility", shouldShowCheat ) ] ]
+                [ label []
+                    [ input [ type_ "checkbox", onCheck ToggleCheat ] []
+                    , text " cheat"
+                    ]
+                ]
             ]

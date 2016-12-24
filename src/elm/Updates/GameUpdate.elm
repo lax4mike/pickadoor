@@ -2,6 +2,7 @@ module Updates.GameUpdate exposing (update)
 
 import GameHelpers exposing (getUnselectedGoatDoors)
 import Ports exposing (playSound, bananaSound, goatSound)
+import Process
 import Random
 import RandomGenerators exposing (randomDoorGenerator, gameGenerator, scrambleDoorsCmd)
 import Task
@@ -59,6 +60,28 @@ update msg model =
 
         ScrambleDoors scrambledDoors ->
             ( { model | doors = scrambledDoors }, Cmd.none )
+
+        SimulateABunch times ->
+            let
+                simulateNowCmd =
+                    Task.perform (always SimulateOnce) Time.now
+
+                simulateAgainSoonCmd =
+                    -- stop at 1 because we SimulateOnce the first time
+                    if (times > 1) then
+                        Task.perform
+                            (always (SimulateABunch (times - 1)))
+                            (Process.sleep (10))
+                    else
+                        Cmd.none
+
+                cmd =
+                    Cmd.batch
+                        [ simulateNowCmd
+                        , simulateAgainSoonCmd
+                        ]
+            in
+                ( model, cmd )
 
         SimulateOnce ->
             ( model, Random.generate RecordSimulation (gameGenerator model) )

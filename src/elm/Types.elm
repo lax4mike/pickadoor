@@ -15,7 +15,7 @@ type Msg
       --
     | ToggleCheat Bool
     | SimulateOnce
-    | SimulateABunch
+    | SimulateABunch Int
     | RecordSimulation GameModel
 
 
