@@ -1,9 +1,12 @@
 module Updates.GameUpdate exposing (update)
 
-import Types exposing (..)
-import Random
-import RandomGenerators exposing (randomDoorGenerator, scrambleDoorsCmd)
+import GameHelpers exposing (getUnselectedGoatDoors)
 import Ports exposing (playSound, bananaSound, goatSound)
+import Random
+import RandomGenerators exposing (randomDoorGenerator, gameGenerator, scrambleDoorsCmd)
+import Task
+import Time
+import Types exposing (..)
 
 
 update : Msg -> GameModel -> ( GameModel, Cmd Msg )
@@ -17,28 +20,14 @@ update msg model =
                 -- either the other Goat, or both Goats
                 -- pass this to the random generator to pick one randomly
                 unSelectedGoatDoors =
-                    case model.selectedDoor of
-                        Nothing ->
-                            (Debug.crash "What are you confirming??")
-
-                        Just selectedDoor ->
-                            List.filter
-                                (\d -> (d /= selectedDoor) && (d.prize /= Banana))
-                                model.doors
+                    getUnselectedGoatDoors model
             in
                 ( model
-                , Random.generate
-                    RandomlyOpenDoor
-                    (randomDoorGenerator unSelectedGoatDoors)
+                , Random.generate RandomlyOpenDoor (randomDoorGenerator unSelectedGoatDoors)
                 )
 
         RandomlyOpenDoor openedDoor ->
-            case openedDoor of
-                Nothing ->
-                    (Debug.crash "There should be a goat to reveal! But I couldn't find one...")
-
-                Just door ->
-                    ( { model | revealedDoor = openedDoor }, playSound goatSound )
+            ( { model | revealedDoor = openedDoor }, playSound goatSound )
 
         SelectFinalDoor clickedDoor ->
             -- don't allow clicking of an open door
@@ -57,9 +46,6 @@ update msg model =
                 in
                     ( { model | finalDoor = Just clickedDoor }, playSound doorSound )
 
-        ScrambleDoors scrambledDoors ->
-            ( { model | doors = scrambledDoors }, Cmd.none )
-
         Reset ->
             let
                 newModel =
@@ -70,6 +56,16 @@ update msg model =
                     }
             in
                 ( newModel, scrambleDoorsCmd )
+
+        ScrambleDoors scrambledDoors ->
+            ( { model | doors = scrambledDoors }, Cmd.none )
+
+        SimulateOnce ->
+            ( model, Random.generate RecordSimulation (gameGenerator model) )
+
+        RecordSimulation simulatedGame ->
+            -- record the simulateion, then reset the game
+            ( simulatedGame, Task.perform (always Reset) Time.now )
 
         _ ->
             ( model, Cmd.none )

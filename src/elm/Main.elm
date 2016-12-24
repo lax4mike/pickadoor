@@ -6,6 +6,7 @@ import View
 import RandomGenerators exposing (scrambleDoorsCmd)
 import Updates.RootUpdate as RootUpdate
 import Subscriptions.KeyboardSubscriptions as KeyboardSubscriptions
+import Subscriptions.Simulation as Simulation
 
 
 initialModel : Model
@@ -31,11 +32,22 @@ init =
     ( initialModel, scrambleDoorsCmd )
 
 
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    -- pass the model to each subscription,
+    -- then batch so Html.program can consume it
+    Sub.batch
+        (List.map
+            ((|>) model)
+            [ KeyboardSubscriptions.subscription, Simulation.subscription ]
+        )
+
+
 main : Program Never Model Msg
 main =
     Html.program
         { init = init
         , update = RootUpdate.update
-        , subscriptions = KeyboardSubscriptions.subscriptions
+        , subscriptions = subscriptions
         , view = View.rootView
         }

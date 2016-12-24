@@ -4,14 +4,19 @@ module Types exposing (..)
 
 
 type Msg
-    = SelectFirstDoor Door
+    = -- door msg's
+      SelectFirstDoor Door
     | ConfirmDoor
     | RandomlyOpenDoor (Maybe Door)
     | SelectFinalDoor Door
     | Reset
     | ScrambleDoors (List Door)
     | NoOp
+      --
     | ToggleCheat Bool
+    | SimulateOnce
+    | SimulateABunch
+    | RecordSimulation GameModel
 
 
 

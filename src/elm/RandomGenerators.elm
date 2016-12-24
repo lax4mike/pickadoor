@@ -2,6 +2,7 @@ module RandomGenerators exposing (..)
 
 import Random
 import Types exposing (..)
+import GameHelpers exposing (getUnselectedGoatDoors, getUnopenedDoors)
 
 
 scrambleDoorsCmd : Cmd Msg
@@ -29,6 +30,46 @@ scrambleDoorsGenerator doorCount =
                     )
         )
         (Random.int 0 (doorCount - 1))
+
+
+{-| generate values for selectedDoor, revealedDoor, and finalDoor
+-}
+gameGenerator : GameModel -> Random.Generator GameModel
+gameGenerator gameModel =
+    -- start with no selections
+    gameModel
+        |> (\gameModel ->
+                -- randomly select the first door
+                Random.map
+                    (\randomDoor ->
+                        { gameModel
+                            | selectedDoor = randomDoor
+                        }
+                    )
+                    (randomDoorGenerator gameModel.doors)
+           )
+        |> Random.andThen
+            (\gameModel ->
+                -- randomly selected a revealed door
+                Random.map
+                    (\randomDoor ->
+                        { gameModel
+                            | revealedDoor = randomDoor
+                        }
+                    )
+                    (randomDoorGenerator (getUnselectedGoatDoors gameModel))
+            )
+        |> Random.andThen
+            (\gameModel ->
+                -- randomly stay or switch
+                Random.map
+                    (\randomDoor ->
+                        { gameModel
+                            | finalDoor = randomDoor
+                        }
+                    )
+                    (randomDoorGenerator (getUnopenedDoors gameModel))
+            )
 
 
 randomDoorGenerator : List Door -> Random.Generator (Maybe Door)

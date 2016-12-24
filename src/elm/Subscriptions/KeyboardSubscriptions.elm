@@ -22,8 +22,8 @@ isSpaceOrEnter keyCode =
     (keyCode == 32) || (keyCode == 13)
 
 
-subscriptions : Model -> Sub Msg
-subscriptions { currentGame } =
+subscription : Model -> Sub Msg
+subscription { currentGame } =
     case getProgress currentGame of
         Start ->
             Keyboard.downs

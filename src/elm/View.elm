@@ -6,7 +6,7 @@ import Types exposing (..)
 import Doors.View as Doors
 import Console.View as Console
 import GameResults.View as GameResults
-import Cheat.View as Cheat
+import Controls.View as Controls
 
 
 rootView : Model -> Html Msg
@@ -21,7 +21,7 @@ rootView model =
                 , div [ class "bottom" ]
                     [ div []
                         [ GameResults.render model.results
-                        , Cheat.render model
+                        , Controls.render model
                         ]
                     , Console.render model.currentGame
                     ]

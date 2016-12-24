@@ -14,7 +14,7 @@ update msg model =
         -- pass the new game to the results updater so it can update as
         -- soon as the game is finished (before it resets)
         newResults =
-            ResultsUpdate.update msg model.results newCurrentGame
+            ResultsUpdate.update model.results newCurrentGame
 
         newIsCheating =
             case msg of
@@ -29,5 +29,5 @@ update msg model =
             , results = newResults
             , isCheating = newIsCheating
           }
-        , gameCmd
+        , Cmd.batch [ gameCmd ]
         )

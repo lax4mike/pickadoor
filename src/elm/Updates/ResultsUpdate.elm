@@ -42,8 +42,8 @@ getGameResult game =
         )
 
 
-update : Msg -> GameResults -> GameModel -> GameResults
-update msg results currentGame =
+update : GameResults -> GameModel -> GameResults
+update results currentGame =
     case getGameResult currentGame of
         StayedWon ->
             { results
